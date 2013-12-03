@@ -43,6 +43,7 @@ int recv_data()
     cmd_state = WAIT_FOR_CMD_STATE;
     
     while(serial_read_byte(&tmp, 1)){
+		printf("C : %x\n", tmp);
         buffer_data[buffer_pos] = tmp;
         if (buffer_pos > 3) {
             if (cmd_state == WAIT_FOR_CMD_STATE){

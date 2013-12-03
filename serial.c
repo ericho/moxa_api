@@ -12,12 +12,14 @@
 
 #include "serial.h"
 
+
 int fd;
 struct termios tio;
-    
+off_t offset;
+   
 int serial_open()
 {
-
+#ifndef USE_GCC 	
     fd = open(SERIAL_PORT, O_RDWR | O_NOCTTY);
     if (fd < 0)
         return SERIAL_ERROR_OPEN;
@@ -41,7 +43,11 @@ int serial_open()
     tcsetattr(fd, TCSANOW, &tio);
     tcflush(fd, TCIFLUSH);
     ioctl(fd, MOXA_SET_OP_MODE, RS232_MODE);
-    
+#else
+	fd = open("stream", O_RDONLY | O_NONBLOCK);
+	offset = lseek(fd, 0, SEEK_SET);
+	ioctl(fd, I_SRDOPT, RNORM);
+#endif
     init_variables();
     return fd;
 }
@@ -60,11 +66,22 @@ int serial_write(char *str, int len)
     return write(fd, str, len);
 }
 
-int serial_write_byte (unsigned char byte)
+int serial_write_byte(unsigned char byte)
 {
     if (fd < 0)
         return SERIAL_ERROR_OPEN;
     return write(fd, &byte, 1);
+}
+
+int serial_read_file(char *buf, int len)
+{
+	int res;
+	if (fd < 0)
+		return SERIAL_ERROR_OPEN;
+	printf("Here\n");
+	res = read(fd, buf, 1);
+	printf("Ret value %d", res);
+	return res;
 }
 
 int serial_read_byte (char *buf, int len)
@@ -72,7 +89,7 @@ int serial_read_byte (char *buf, int len)
     int res;
     if (fd < 0)
         return SERIAL_ERROR_OPEN;
-    fcntl(fd, F_SETFL, 0);
+	fcntl(fd, F_SETFL, 0);
     res = read(fd, buf, len);
     return res;
 }

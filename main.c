@@ -10,17 +10,23 @@ int main (int argc, char* argv[])
 	
 	printf("Iniciando aplicacion...\n");
 	int i = serial_open();
-	
+	printf("Puerto abierto\n");
 	char temp;
 	unsigned char *ptr_tmp;
 	ptr_tmp = (unsigned char *) malloc(2*sizeof(unsigned char));
 	*ptr_tmp = 0xEE;
 	*(ptr_tmp + 1) = 0xBB;
+	
+	//data_from_network();
+	char c[20];
+	serial_read_file(c, 1);
+	
+	/*
 	if (device_status() == 0)
 		printf("Dispositivo presente\n");
 	printf ("Direccion de red : %x\n", get_network_status());
 	printf ("Nodos conectados : %d\n", get_children_amount());
-	
+	*/
 	
 	//i = recv_data();
 	

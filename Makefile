@@ -1,6 +1,8 @@
-CC=arm-linux-gcc
+
+#CC=arm-linux-gcc
+CC=gcc
 LIBRARY=.
-TARGET=app_moxa
+TARGET=moxa_api
 CFLAGS=-I$(LIBRARY)
 CXXFLAGS=
 OBJS=main.o

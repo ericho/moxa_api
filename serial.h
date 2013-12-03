@@ -23,11 +23,11 @@
 #define SERIAL_PORT     "/dev/ttyM0"
 #define BAUDRATE        B38400
 
-
 int serial_open();
+int serial_write_byte(unsigned char byte);
 int serial_close ();
 int serial_write(char *str, int len);
-int serial_write_byte(unsigned char byte);
+
 int serial_read_byte (char *buf, int len);
 void init_variables(void);
 int add_byte_to_buffer(unsigned char data);

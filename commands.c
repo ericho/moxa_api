@@ -60,3 +60,10 @@ int get_children_amount()
 		}
 	}
 }
+
+int data_from_network()
+{
+	if (recv_data() == COMMAND_RECEIVED) {
+		printf("Command detected\n");
+	}
+}
