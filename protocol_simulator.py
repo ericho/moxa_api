@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from struct import pack
 import random
+import serial
+import config
+import os
+import threading
+import time
+import sys
 
 
 class ProtocolSimulator(object):
@@ -20,9 +26,49 @@ class ProtocolSimulator(object):
         self.ID = '\x01'
         self.CMD = '\x07'
         self.nodes = []
+        # Getting initial configuration
+        self.config = config.main_config
+        config.config()
+        #self.signal = signal.signal(signal.SIGINT, self.end_thread)
 
+    def open_port(self):
+        try:
+            self.serial = serial.Serial(self.file, baudrate=38400)
+        except Exception as e:
+            print "Error", e
+            return False
+
+    def start_reading(self):
+        try:
+            print "Launching reading thread..."
+            self.thread = threading.Thread(target=self.read)
+            self.thread.start()
+        except Exception as e:
+            print "Error running read thread", e
+            
+    def end_thread(self, signal, frame):
+        print "Signal received"
+        self.thread.exit()
+        
+    def read(self):
+        """ This function runs in a thread to continuosly read the port """
+        keep_running = True
+        while keep_running:
+            try:
+                read_byte = self.serial.read()
+                if read_byte == '!':
+                    keep_running = False
+                print type(read_byte), read_byte
+            except KeyboardInterrupt:
+                keep_running = False
+
+    def push_recv_byte(self, recv_byte):
+        """ A queue handles the byte received to detect a valid frame """
+        pass
+            
     def write(self, stream):
-        self.fd.write(stream)
+        self.serial.write(stream)
+        #self.fd.write(stream)
 
     def write_data(self):
         for node in self.nodes:
@@ -35,7 +81,8 @@ class ProtocolSimulator(object):
             print 'Cannot open the file %s' % self.file
 
     def close_file(self):
-        self.fd.close()
+        self.serial.close()
+        #self.fd.close()
 
     def create_nodes(self):
         for i in range(0, self.n_nodes):
@@ -113,9 +160,10 @@ class Node(object):
         self.stream += pack('!f', self.temp)
 
 if __name__ == "__main__":
-    ps = ProtocolSimulator(1, "stream")
-    ps.open_file()
-    ps.create_nodes()
-    ps.generate_data()
-    ps.write_data()
-    ps.close_file()
+    ps = ProtocolSimulator(1, "/dev/pts/4")
+    ps.open_port()
+    ps.start_reading()
+    #ps.create_nodes()
+    #ps.generate_data()
+    #ps.write_data()
+    #ps.close_file()
