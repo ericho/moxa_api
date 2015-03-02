@@ -21,7 +21,7 @@
 #include <termios.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <stropts.h>
+//#include <stropts.h>
 #ifndef USE_GCC
 	#include <asm/ioctls.h>
 	#include <moxadevice.h>

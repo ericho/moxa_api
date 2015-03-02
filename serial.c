@@ -12,14 +12,12 @@
 
 #include "serial.h"
 
-
 int fd;
 struct termios tio;
 off_t offset;
    
 int serial_open()
 {
-#ifndef USE_GCC 	
     fd = open(SERIAL_PORT, O_RDWR | O_NOCTTY);
     if (fd < 0)
         return SERIAL_ERROR_OPEN;
@@ -42,12 +40,10 @@ int serial_open()
     
     tcsetattr(fd, TCSANOW, &tio);
     tcflush(fd, TCIFLUSH);
+#ifndef USE_GCC
     ioctl(fd, MOXA_SET_OP_MODE, RS232_MODE);
-#else
-	fd = open("stream", O_RDONLY | O_NONBLOCK);
-	offset = lseek(fd, 0, SEEK_SET);
-	ioctl(fd, I_SRDOPT, RNORM);
 #endif
+
     init_variables();
     return fd;
 }
@@ -87,6 +83,7 @@ int serial_read_file(char *buf, int len)
 int serial_read_byte (char *buf, int len)
 {
     int res;
+    fcntl(fd, F_SETFL, FNDELAY);
     if (fd < 0)
         return SERIAL_ERROR_OPEN;
 	fcntl(fd, F_SETFL, 0);
@@ -103,6 +100,7 @@ void *serial_recv (void *arg)
     while (1) { // Seria bueno algo de sincronizacion de hilos
         len = serial_read_byte(&recv, 1);
         if (len > 0){
+	  printf("Recv data\n");
             if (add_byte_to_buffer(recv) == APP_BUFFER_UPDATED){
                 
                 analize_recv_data();
