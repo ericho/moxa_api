@@ -7,6 +7,32 @@ import time
 import sys
 import struct
 
+protocol_messages = {
+    'COMMAND_RECEIVED': '\x00',
+    'INCORRECT_FRAME_SIZE': '\x01',
+    'WORNG_HEADER': '\x02',
+    'WRONG_FOOTER': '\x03',
+    'UNKNOWN_COMMAND': '\x04',
+    'TIMEOUT_ERROR': '\x05'
+}
+
+protocol_command = {
+    'DEVICE_STATUS': '\x01',
+    'GET_NETWORK_STATUS': '\x02',
+    'GET_CHILDREN_AMOUNT': '\x03',
+    'BAD_PARAMETERS': '\x56',
+    'DEVICE_UP': '\x57',
+    'IN_NETWORK_STATUS': '\x58',
+    'OUT_NETWORK_STATUS': '\x59',
+    'ENABLE_DATA_RECEPTION': '\x5a',
+    'DISABLE_DATA_RECEPTION': '\x5b',
+    'DATA_RECEPTION_CHANGED': '\x5c',
+    'SET_REQUEST_MODE': '\x5d',
+    'SET_SLEEP_MODE': '\x5e',
+    'SET_RF_MODE': '\x5f',
+    'NODE_COMMAND_SENT': '\x60'
+}
+
 class FrameCommand(object):
     """ Class to represents the command structure """
 
@@ -185,7 +211,7 @@ class ProtocolSimulator(object):
 
 
 if __name__ == "__main__":
-    ps = ProtocolSimulator(1, "/dev/pts/2")
+    ps = ProtocolSimulator(1, "/dev/pts/4")
     ps.open_port()
     ps.start_reading()
     #ps.create_nodes()
