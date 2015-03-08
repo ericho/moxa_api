@@ -7,31 +7,6 @@ import time
 import sys
 import struct
 
-protocol_messages = {
-    'COMMAND_RECEIVED': '\x00',
-    'INCORRECT_FRAME_SIZE': '\x01',
-    'WORNG_HEADER': '\x02',
-    'WRONG_FOOTER': '\x03',
-    'UNKNOWN_COMMAND': '\x04',
-    'TIMEOUT_ERROR': '\x05'
-}
-
-protocol_command = {
-    'DEVICE_STATUS': '\x01',
-    'GET_NETWORK_STATUS': '\x02',
-    'GET_CHILDREN_AMOUNT': '\x03',
-    'BAD_PARAMETERS': '\x56',
-    'DEVICE_UP': '\x57',
-    'IN_NETWORK_STATUS': '\x58',
-    'OUT_NETWORK_STATUS': '\x59',
-    'ENABLE_DATA_RECEPTION': '\x5a',
-    'DISABLE_DATA_RECEPTION': '\x5b',
-    'DATA_RECEPTION_CHANGED': '\x5c',
-    'SET_REQUEST_MODE': '\x5d',
-    'SET_SLEEP_MODE': '\x5e',
-    'SET_RF_MODE': '\x5f',
-    'NODE_COMMAND_SENT': '\x60'
-}
 
 class FrameCommand(object):
     """ Class to represents the command structure """
@@ -52,6 +27,49 @@ class FrameCommand(object):
                                                              self.data_length,
                                                              self.data)
         return msg
+
+class ProtocolMessages(object):
+    """ To handle all the protocol messages and commands """
+
+    def __init__(self):
+
+        self.protocol_messages = {
+            'COMMAND_RECEIVED': '\x00',
+            'INCORRECT_FRAME_SIZE': '\x01',
+            'WRONG_HEADER': '\x02',
+            'WRONG_FOOTER': '\x03',
+            'UNKNOWN_COMMAND': '\x04',
+            'TIMEOUT_ERROR': '\x05'
+        }
+
+        self.protocol_command = {
+            'DEVICE_STATUS': '\x01',
+            'GET_NETWORK_STATUS': '\x02',
+            'GET_CHILDREN_AMOUNT': '\x03',
+            'BAD_PARAMETERS': '\x56',
+            'DEVICE_UP': '\x57',
+            'IN_NETWORK_STATUS': '\x58',
+            'OUT_NETWORK_STATUS': '\x59',
+            'ENABLE_DATA_RECEPTION': '\x5a',
+            'DISABLE_DATA_RECEPTION': '\x5b',
+            'DATA_RECEPTION_CHANGED': '\x5c',
+            'SET_REQUEST_MODE': '\x5d',
+            'SET_SLEEP_MODE': '\x5e',
+            'SET_RF_MODE': '\x5f',
+            'NODE_COMMAND_SENT': '\x60'
+        }
+
+    def incorrect_frame_size(self):
+        pass
+
+    def wrong_header(self):
+        pass
+
+    def wrong_footer(self):
+        pass
+
+    def unknown_command(self):
+        pass
 
 class ProtocolSimulator(object):
     """ This class generates random data and stores it into a file
@@ -77,6 +95,7 @@ class ProtocolSimulator(object):
         self.config = config.main_config
         config.config()
         #self.signal = signal.signal(signal.SIGINT, self.end_thread)
+        self.pm = ProtocolMessages()
 
     def open_port(self):
         try:
@@ -133,13 +152,12 @@ class ProtocolSimulator(object):
                         self.frame_detected = True
                     else:
                         # The frame has incorrect length
-                        # TODO: Send frame with error message: INCORRECT_MSG_SIZE
+                        self._msg_incorrect_size()
                         self._clean_frame()
 
                 else:
                     # Cleaning the list
-                    # TODO: Send frame with error message: WRONG_HEADER
-                    print "Invalid frame"
+                    self._msg_wrong_header()
                     self._clean_frame()
             else:
                 # We are in the process of received a frame
@@ -160,7 +178,7 @@ class ProtocolSimulator(object):
                         # Clean up an receive new frames
                         self._clean_frame()
                     else:
-                        # TODO: Send error message: WRONG FOOTER
+                        self._msg_wrong_footer()
                         self._clean_frame()
 
 
@@ -168,6 +186,18 @@ class ProtocolSimulator(object):
         self.frame_length = 0
         self.frame_recv = []
         self.frame_detected = False
+
+    def _msg_incorrect_size(self):
+        self.write(self.pack_message(self.pm.protocol_messages['INCORRECT_FRAME_SIZE']))
+
+    def _msg_wrong_header(self):
+        self.write(self.pack_message(self.pm.protocol_messages['WRONG_HEADER']))
+
+    def _msg_wrong_footer(self):
+        self.write(self.pack_message(self.pm.protocol_messages['WRONG_FOOTER']))
+
+    def _msg_unknown_command(self):
+        self.write(self.pack_message(self.pm.protocol_messages['UNKNOWN_COMMAND']))
 
     def push_recv_byte(self, recv_byte):
         """ A queue handles the byte received to detect a valid frame """
@@ -208,6 +238,11 @@ class ProtocolSimulator(object):
         packed_data += self.FOOTER
         return packed_data
 
+    def pack_message(self, msg):
+        # Messages are always 6 bytes long
+        frame_len = struct.pack('B', 6)
+        packed_msg = self.HEADER + '\x00' + frame_len + self.ID + msg + self.FOOTER
+        return packed_msg
 
 
 if __name__ == "__main__":
