@@ -13,12 +13,12 @@
 
 extern command_t cmd_temp;
 
-#define DEVICE_STATUS			0x01
-#define GET_NETWORK_STATUS 		0x02
+#define DEVICE_STATUS		0x01
+#define GET_NETWORK_STATUS 	0x02
 #define GET_CHILDREN_AMOUNT 	0x03
 
-#define BAD_PARAMETERS		    0x56
-#define DEVICE_UP			    0x57
+#define BAD_PARAMETERS		0x56
+#define DEVICE_UP		0x57
 #define IN_NETWORK_STATUS       0x58
 #define OUT_NETWORK_STATUS      0x59
 #define ENABLE_DATA_RECEPTION   0x5a
@@ -29,7 +29,7 @@ extern command_t cmd_temp;
 #define SET_RF_MODE             0x5f
 #define NODE_COMMAND_SENT       0x60
 
-#define COMMAND_SENT			0
+#define COMMAND_SENT		0
 #define COMMAND_RECEIVED        0
 #define INCORRECT_FRAME_SIZE    1
 #define INCORRECT_HEADER        2

@@ -23,7 +23,7 @@
 #ifndef USE_GCC
 #define SERIAL_PORT     "/dev/ttyM0"
 #else
-#define SERIAL_PORT     "/dev/pts/2"
+#define SERIAL_PORT     "/dev/pts/5"
 #endif
 #define BAUDRATE        B38400
 
