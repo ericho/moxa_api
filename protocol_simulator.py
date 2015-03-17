@@ -7,6 +7,8 @@ import time
 import sys
 import struct
 
+HEADER = '\x55'
+FOOTER = '\xaa'
 
 class FrameCommand(object):
     """ Class to represents the command structure """
@@ -16,7 +18,16 @@ class FrameCommand(object):
         self.command = 0
         self.data_length = 0
         self.data = ''
+        
 
+    def to_serial(self):
+        frame_len = struct.pack('B', self.data_length + 6)
+        packed_data = HEADER + '\x00' + frame_len + struct.pack('B', self.id_message) + self.command
+        if self.data_length > 0:
+            packed_data += self.data
+        packed_data += FOOTER
+        return packed_data
+        
     def __str__(self):
         return self.__repr__()
 
@@ -59,6 +70,40 @@ class ProtocolMessages(object):
             'NODE_COMMAND_SENT': '\x60'
         }
 
+        self.command_responses = {
+            1 : self.device_status,
+            2 : self.network_status,
+            3 : self.children_amount,
+            4 : self.children_list,
+            5 : self.lqi_rssi,
+            6 : self.send_data_node,
+            7 : self.data_from_node
+        }
+
+    def device_status(self):
+        print "Device status called"
+        fc = FrameCommand()
+        fc.command = self.protocol_command['DEVICE_UP']
+        return fc
+
+    def network_status(self):
+        print "Get Network status"
+
+    def children_amount(self):
+        print "Get Children amount"
+
+    def children_list(self):
+        print "Get children list"
+
+    def lqi_rssi(self):
+        print "Get LQI RSSI"
+
+    def send_data_node(self):
+        print "Send data node"
+
+    def data_from_node(self):
+        print "Data from node"
+        
     def incorrect_frame_size(self):
         pass
 
@@ -69,6 +114,9 @@ class ProtocolMessages(object):
         pass
 
     def unknown_command(self):
+        pass
+
+    def _pack_message(self, msg):
         pass
 
 class ProtocolSimulator(object):
@@ -174,6 +222,7 @@ class ProtocolSimulator(object):
                         for i in range(data_command.data_length):
                             data_command.data += self.frame_recv[i + 5]
                         print data_command
+                        self.parse_command(data_command)
                         # TODO: Do something with this data_command
                         # Clean up an receive new frames
                         self._clean_frame()
@@ -181,6 +230,14 @@ class ProtocolSimulator(object):
                         self._msg_wrong_footer()
                         self._clean_frame()
 
+    def parse_command(self, data_command):
+        """ Parses the command inside a FrameCommand object and call
+            the appropiate function to respond. """
+        print "Command recv {0}".format(data_command.command)
+        callback = self.pm.command_responses[data_command.command]
+        res = callback()
+        self.write(res.to_serial())
+        
 
     def _clean_frame(self):
         self.frame_length = 0
@@ -243,6 +300,14 @@ class ProtocolSimulator(object):
         frame_len = struct.pack('B', 6)
         packed_msg = self.HEADER + '\x00' + frame_len + self.ID + msg + self.FOOTER
         return packed_msg
+
+    def data_to_serial(self, fc):
+        frame_len = struct.pack('B', fc.data_length + 6)
+        packed_data = self.HEADER + '\x00' + frame_len + self.ID + struct.pack('B', fc.command)
+        if fc.data_length > 0:
+            packed_data += data
+        packed_data += self.FOOTER
+        return packed_data
 
 
 if __name__ == "__main__":

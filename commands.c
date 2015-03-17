@@ -18,8 +18,12 @@ int get_children_amount();
 
 unsigned char device_status()
 {
+	int recv;
 	if (send_command(DEVICE_STATUS, NULL, 0, 0) == COMMAND_SENT) {
-		if (recv_data() == COMMAND_RECEIVED){
+		recv = recv_data();
+		printf("Data received : %d\n", recv);
+		if (recv == COMMAND_RECEIVED) {
+			printf("Command received DEVICE_STATUS\n");
 			if (cmd_temp.cmd == DEVICE_UP)
 				return 0;
 		}

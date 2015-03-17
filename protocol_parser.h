@@ -1,8 +1,8 @@
 #define	HEADER_TO_CARD	        0x55
 #define FOOTER_TO_CARD	        0xAA
-#define HEADER_FROM_CARD	0x98
-#define HEADER_ERROR_FROM_CARD	0x99
-#define FOOTER_FROM_CARD	0xCC
+#define HEADER_FROM_CARD	0x55
+#define HEADER_ERROR_FROM_CARD	0xAA
+#define FOOTER_FROM_CARD	0xAA
 
 #define WRONG_HEADER		0x50
 #define INCORRECT_MSG_SIZE	0x51
@@ -32,4 +32,4 @@ int recv_data();
 int send_command(unsigned char cmd, unsigned char *data, int len, unsigned char id);
 void print_data_frame(unsigned char *data, int len);
 command_t parse_recv_command(unsigned char *buffer, int recv_len);
-
+int _send_bad_command(unsigned char header, unsigned char footer, unsigned char cmd, int len);

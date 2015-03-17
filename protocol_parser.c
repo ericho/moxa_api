@@ -62,9 +62,11 @@ int recv_data()
 				if (buffer_pos == recv_frame_len - 1) {
 					if (buffer_data[recv_frame_len - 1] == FOOTER_FROM_CARD) {
 						cmd_temp = parse_recv_command(buffer_data, recv_frame_len);
+						printf("Command received!\n");
 						return COMMAND_RECEIVED;
 					}
 					else {
+						printf("Entering here : %d\n", buffer_data[recv_frame_len - 1]);
 						return INCORRECT_FOOTER;
 					}
 				}
@@ -93,7 +95,13 @@ command_t parse_recv_command(unsigned char *buffer, int recv_len)
 	}
 	return cmd_t;
 }
-
+/* send_command : Send commands with the specified parameters
+ * unsigned char cmd : The command to be send.
+ * unsigned chat *data : The data to be sent. 
+ * int len: The length of *data
+ * unsigned char id : The id message field.  
+ *
+ */
 int send_command(unsigned char cmd, unsigned char *data, int len, unsigned char id)
 {
 	unsigned char *tmp;
@@ -116,6 +124,25 @@ int send_command(unsigned char cmd, unsigned char *data, int len, unsigned char 
 	free(tmp);
 	
 	return i;
+}
+
+/*
+ * Send incorrect data to device for testing purposes. 
+ */
+int _send_bad_command(unsigned char header, unsigned char footer, unsigned char cmd, int len) {
+	unsigned char *msg;
+	int ret;
+	// This messages always be 6 bytes length
+	msg = (unsigned char *) malloc(sizeof(char) * 6);
+	*msg = header;
+	*(msg + 1) = (unsigned char) (len >> 8) & 0x00ff;
+	*(msg + 2) = (unsigned char) len & 0x00ff;
+	*(msg + 3) = 0;
+	*(msg + 4) = cmd;
+	*(msg + 5) = footer;
+	ret = write_data_frame(msg, 6);
+
+	return ret;
 }
 
 void print_data_frame(unsigned char *data, int len)

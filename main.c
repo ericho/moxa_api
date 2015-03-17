@@ -17,6 +17,19 @@
 
 #include "main.h"
 
+void tests() {
+	int i;
+	// Testing with bad length
+	printf("Testing with bad length\n"); 
+	i = _send_bad_command(0x55, 0xaa, 0x01, 0xffff);
+	// Testing with bad header
+	printf("Testing with bad header\n"); 
+	i = _send_bad_command(0x33, 0xaa, 0x01, 0x0006);
+	// Testing with bad footer
+	printf("Testing with bad footer\n"); 
+	i = _send_bad_command(0x55, 0xee, 0x01, 0x0006);
+}
+
 int main (int argc, char* argv[])
 {
 
@@ -25,6 +38,11 @@ int main (int argc, char* argv[])
 	printf("Starting application...\n");
 	int i = serial_open();
 	printf("Serial port open %d\n", i);
+	printf("=> Send device_status() : ");
+	i = device_status();
+	printf("%d\n", i);
+	return 0;
+	i = serial_write_byte('a');
 	char temp;
 	unsigned char *ptr_tmp;
 	ptr_tmp = (unsigned char *) malloc(2*sizeof(unsigned char));
