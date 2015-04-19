@@ -21,12 +21,18 @@
 #include <termios.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <errno.h>
 //#include <stropts.h>
 #ifndef USE_GCC
 	#include <asm/ioctls.h>
 	#include <moxadevice.h>
 #endif
 
+#ifdef DEBUG
+#define DEBUG_PRINT printf
+#else
+#define DEBUG_PRINT(...)
+#endif
 
 void *serial_recv(void *arg);
 

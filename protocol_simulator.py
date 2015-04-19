@@ -311,7 +311,7 @@ class ProtocolSimulator(object):
 
 
 if __name__ == "__main__":
-    ps = ProtocolSimulator(1, "/dev/pts/4")
+    ps = ProtocolSimulator(1, "/dev/pts/23")
     ps.open_port()
     ps.start_reading()
     #ps.create_nodes()

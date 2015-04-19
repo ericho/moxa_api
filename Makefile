@@ -10,7 +10,7 @@ OBJS=main.o
 
 
 all: $(OBJS)
-	$(CC) *.c -o $(TARGET) -lpthread
+	$(CC) *.c -o $(TARGET) -lpthread -DDEBUG
 
 serial.o: $(LIBRARY)/serial.c
 	$(CC) -c $(LIBRARY)/serial.c
