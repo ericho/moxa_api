@@ -23,7 +23,7 @@ int get_children_amount();
  * received from device. Otherwise will return a
  * negative value.
  */
-unsigned char device_status()
+unsigned char device_status(void)
 {
 	int recv;
 	if (send_command(DEVICE_STATUS, NULL, 0, 0) == COMMAND_SENT) {
@@ -76,6 +76,27 @@ int get_children_amount()
 		}
 	}
 }
+
+int get_children_list(void)
+{
+	return 0;
+}
+
+int get_lqi_rssi(void)
+{
+	return 0;
+}
+
+int send_data(uint16_t address, uint8_t *data, int len)
+{
+	return 0;
+}
+
+int enable_data_reception(void)
+{
+	return 0;
+}
+
 
 int data_from_network()
 {

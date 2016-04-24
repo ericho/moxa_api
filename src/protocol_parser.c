@@ -13,18 +13,17 @@
 
 static int recv_frame_len;
 command_t cmd_temp;
+uint8_t *prepare_command(uint8_t cmd, uint8_t id, uint8_t *data, int len);
 
 void analize_recv_data(void)
 {
-	printf("Analizando...\n");
 	if (serial_buffer_cont >= 3) {
-		if (cmd_state = WAIT_FOR_CMD_STATE) {
+		if (cmd_state == WAIT_FOR_CMD_STATE) {
 			if (app_serial_buffer[0] == HEADER_FROM_CARD) {
 				recv_frame_len = (int) app_serial_buffer[1] << 8;
 				recv_frame_len |= (int) app_serial_buffer[2];
 				if (recv_frame_len >= 6 && recv_frame_len <= 261)
 					cmd_state = CMD_DETECTED_STATE;
-				printf("Longitud de trama : %d\n", recv_frame_len);
 			}
 		}
 		cmd_state = WAIT_FOR_CMD_STATE;
@@ -102,28 +101,46 @@ command_t parse_recv_command(unsigned char *buffer, int recv_len)
  * unsigned char id : The id message field.  
  *
  */
-int send_command(unsigned char cmd, unsigned char *data, int len, unsigned char id)
+int send_command(uint8_t cmd, uint8_t *data, int len, uint8_t id)
 {
-	unsigned char *tmp;
+	uint8_t *tmp;
 	int i;
 	// Min length 6
-	tmp = (unsigned char *) malloc(sizeof(char)*(6+len));
-	*tmp = HEADER_TO_CARD;
-	*(tmp + 1) = (unsigned char) ((len + 6) >> 8) & 0x00ff;
-	*(tmp + 2) = (unsigned char) (6 + len) & 0x00ff;
-	*(tmp + 3) = id;
-	*(tmp + 4) = cmd;
-	if (len > 0) {
-		for (i=0; i<len; i++)
-			*(tmp + 5 + i) = (unsigned char) *(data + i);
-	}
-	*(tmp + 5 + len) = FOOTER_TO_CARD;
+	
+	tmp = prepare_command(cmd, id, data, len);
+	      
+	if (tmp == NULL)
+		return -ENOMEM;
 	
 	i = write_data_frame(tmp, len + 6);
+	print_data_frame(tmp, len + 6);
 	
 	free(tmp);
 	
 	return i;
+}
+
+uint8_t *prepare_command(uint8_t cmd, uint8_t id, uint8_t *data, int len)
+{
+	uint8_t *tmp;
+	int i;
+	tmp = (uint8_t*) malloc(sizeof(uint8_t) * (len + 6));
+	if (tmp == NULL)
+		return tmp;
+	memset(tmp, 0, sizeof(uint8_t) * (len + 6));
+
+	*tmp = HEADER_TO_CARD;
+	*(tmp + 1) = (uint8_t) ((len + 6) >> 8) & 0x00ff;
+	*(tmp + 2) = (uint8_t) (6 + len) & 0x00ff;
+	*(tmp + 3) = id;
+	*(tmp + 4) = cmd;
+	
+	for (i=0; i<len; i++)
+		*(tmp + 5 + i) = (uint8_t) *(data + i);
+
+	*(tmp + 5 + len) = FOOTER_TO_CARD;
+
+	return tmp;
 }
 
 /*
@@ -149,7 +166,7 @@ void print_data_frame(unsigned char *data, int len)
 {
 	int i;
 	if (len >= 6) {
-		printf("Datos\n");
+		printf("Data\n");
 		for (i=0; i<len; i++)
 			printf("%x ", *(data + i));
 		printf("\n");

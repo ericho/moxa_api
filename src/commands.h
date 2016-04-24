@@ -9,7 +9,7 @@
  * 
 */
 
-#include "main.h"
+#include "serial_dongle.h"
 
 extern command_t cmd_temp;
 

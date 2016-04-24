@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "main.h"
+#include "serial_dongle.h"
 
 void tests() {
 	int i;
@@ -36,24 +36,30 @@ int main (int argc, char* argv[])
 	pthread_t thread_read_serial;
 
 	printf("Starting application...\n");
-	int i = serial_open();
+	int i = open_device();
 	printf("Serial port open %d\n", i);
 	printf("=> Send device_status() : ");
 	i = device_status();
 	printf("%d\n", i);
+
+	i = get_network_status();
+	printf("Get network status sent\n");
+
+	i = get_children_amount();
+	printf("Get children amount sent\n");
 	return 0;
 
 
-	i = serial_write_byte('a');
-	char temp;
-	unsigned char *ptr_tmp;
-	ptr_tmp = (unsigned char *) malloc(2*sizeof(unsigned char));
-	*ptr_tmp = 0xEE;
-	*(ptr_tmp + 1) = 0xBB;
+	/* i = serial_write_byte('a'); */
+	/* char temp; */
+	/* unsigned char *ptr_tmp; */
+	/* ptr_tmp = (unsigned char *) malloc(2*sizeof(unsigned char)); */
+	/* *ptr_tmp = 0xEE; */
+	/* *(ptr_tmp + 1) = 0xBB; */
 
-	//data_from_network();
-	char c[20];
-	//serial_read_file(c, 1);
+	/* //data_from_network(); */
+	/* char c[20]; */
+	/* //serial_read_file(c, 1); */
 
 	/*
 	if (device_status() == 0)
@@ -62,18 +68,18 @@ int main (int argc, char* argv[])
 	printf ("Nodos conectados : %d\n", get_children_amount());
 	*/
 
-	while(!(i = serial_read_byte(c, 1)));
+	/* while(!(i = serial_read_byte(c, 1))); */
 
 
-	//i = recv_data();
+	/* //i = recv_data(); */
 
-	printf("El valor de i : %d c %x\n", i, c[0]);
+	/* printf("El valor de i : %d c %x\n", i, c[0]); */
 
-	pthread_create(&thread_read_serial, NULL, serial_recv, NULL);
-	//serial_write_byte('A');
-	//printf("Se escribio el byte\n");
+	/* pthread_create(&thread_read_serial, NULL, serial_recv, NULL); */
+	/* //serial_write_byte('A'); */
+	/* //printf("Se escribio el byte\n"); */
 
-	while (1)
-		sleep(1);
+	/* while (1) */
+	/* 	sleep(1); */
 	return 0;
 }

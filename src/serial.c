@@ -8,6 +8,11 @@
  * 
  * Codigo basado en programas de ejemplo de la API de MOXA
  * 
+ * National laboratory of advanced informatics (LANIA)
+ * Sensors and embedded systems laboratory
+ *
+ * API to develop applications using the RS232 to ZigBee adapter
+ * Some code is based on MOXA API example programs 
 */
 
 #include "serial.h"
@@ -15,9 +20,18 @@
 int fd;
 struct termios tio;
 off_t offset;
-   
-int serial_open()
+
+int serial_write_byte(unsigned char byte);
+int serial_write(char *str, int len);
+int serial_read_byte (char *buf, int len);
+void init_variables(void);
+int add_byte_to_buffer(unsigned char data);
+void flush_serial_buffer(void);
+void *serial_recv(void *arg);
+
+int open_device()
 {
+	printf("Opening port %s\n", SERIAL_PORT);
 	fd = open(SERIAL_PORT, O_RDWR | O_NOCTTY);
 	if (fd < 0)
 		return SERIAL_ERROR_OPEN;
@@ -48,18 +62,16 @@ int serial_open()
 	return fd;
 }
 
+int close(int fd)
+{
+	return close(fd);
+}
+
 void init_variables(void)
 {
 	serial_buffer_cont = 0;
 	cmd_state = 0; 
 	memset(app_serial_buffer, 0, MAX_SERIAL_BUFFER_SIZE);
-}
-
-int serial_write(char *str, int len)
-{
-	if (fd < 0)
-		return SERIAL_ERROR_OPEN;
-	return write(fd, str, len);
 }
 
 int serial_write_byte(unsigned char byte)
@@ -71,24 +83,18 @@ int serial_write_byte(unsigned char byte)
 
 int serial_read_file(char *buf, int len)
 {
-	int res;
 	if (fd < 0)
 		return SERIAL_ERROR_OPEN;
-	printf("Here\n");
-	res = read(fd, buf, 1);
-	printf("Ret value %d", res);
-	return res;
+	return read(fd, buf, 1);
 }
 
 int serial_read_byte (char *buf, int len)
 {
-	int res;
 	fcntl(fd, F_SETFL, FNDELAY);
 	if (fd < 0)
 		return SERIAL_ERROR_OPEN;
 	fcntl(fd, F_SETFL, 0);
-	res = read(fd, buf, len);
-	return res;
+	return read(fd, buf, len);
 }
 
 
@@ -97,17 +103,13 @@ void *serial_recv (void *arg)
 	char buf[1024];
 	unsigned char recv;
 	int len;
-	while (1) { // Seria bueno algo de sincronizacion de hilos
+	while (1) {
 		len = serial_read_byte(&recv, 1);
 		if (len > 0) {
-			printf("Recv data\n");
-			if (add_byte_to_buffer(recv) == APP_BUFFER_UPDATED) {
-				
+			if (add_byte_to_buffer(recv) == APP_BUFFER_UPDATED)
 				analize_recv_data();
-			}
-			else {
+			else
 				flush_serial_buffer();
-			}
 		}
 	}
 }

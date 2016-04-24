@@ -39,6 +39,7 @@ class FrameCommand(object):
                                                              self.data)
         return msg
 
+
 class ProtocolMessages(object):
     """ To handle all the protocol messages and commands """
 
@@ -311,7 +312,7 @@ class ProtocolSimulator(object):
 
 
 if __name__ == "__main__":
-    ps = ProtocolSimulator(1, "/dev/pts/23")
+    ps = ProtocolSimulator(1, "/dev/pts/4")
     ps.open_port()
     ps.start_reading()
     #ps.create_nodes()

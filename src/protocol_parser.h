@@ -1,3 +1,5 @@
+#include "serial_dongle.h"
+
 #define	HEADER_TO_CARD	        0x55
 #define FOOTER_TO_CARD	        0xAA
 #define HEADER_FROM_CARD	0x55
@@ -13,7 +15,6 @@
 #define COMMAND_SENT		0
 
 #define MIN_MSG_SIZE		5
-#define NULL			0
 #define WAIT_FOR_CMD_STATE      0
 #define CMD_DETECTED_STATE      1
 
@@ -24,12 +25,4 @@
 #define UNKNOWN_COMMAND         4
 #define TIMEOUT_ERROR           5
 
-#include "main.h"
 
-int send_serial_command(unsigned char *dat, int len);
-void analize_recv_data(void);
-int recv_data();
-int send_command(unsigned char cmd, unsigned char *data, int len, unsigned char id);
-void print_data_frame(unsigned char *data, int len);
-command_t parse_recv_command(unsigned char *buffer, int recv_len);
-int _send_bad_command(unsigned char header, unsigned char footer, unsigned char cmd, int len);

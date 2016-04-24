@@ -9,7 +9,7 @@
  * 
 */
 
-#include "main.h"
+#include "serial_dongle.h"
 
 #define SERIAL_OK                   0
 #define SERIAL_ERROR_FD             -1
@@ -20,11 +20,6 @@
 #define MAX_APP_BUFFER_SIZE_REACHED 1
 #define MAX_SERIAL_BUFFER_SIZE      1024
 
-#ifndef USE_GCC
-#define SERIAL_PORT     "/dev/ttyM0"
-#else
-#define SERIAL_PORT     "/dev/pts/22"
-#endif
 #define BAUDRATE        B38400
 
 int serial_open();
