@@ -7,6 +7,8 @@ import time
 import sys
 import struct
 
+from protocol_parser import ProtocolParser
+
 HEADER = '\x55'
 FOOTER = '\xaa'
 
@@ -18,7 +20,7 @@ class FrameCommand(object):
         self.command = 0
         self.data_length = 0
         self.data = ''
-        
+
 
     def to_serial(self):
         frame_len = struct.pack('B', self.data_length + 6)
@@ -27,7 +29,7 @@ class FrameCommand(object):
             packed_data += self.data
         packed_data += FOOTER
         return packed_data
-        
+
     def __str__(self):
         return self.__repr__()
 
@@ -104,7 +106,7 @@ class ProtocolMessages(object):
 
     def data_from_node(self):
         print "Data from node"
-        
+
     def incorrect_frame_size(self):
         pass
 
@@ -238,7 +240,7 @@ class ProtocolSimulator(object):
         callback = self.pm.command_responses[data_command.command]
         res = callback()
         self.write(res.to_serial())
-        
+
 
     def _clean_frame(self):
         self.frame_length = 0
@@ -309,6 +311,19 @@ class ProtocolSimulator(object):
             packed_data += data
         packed_data += self.FOOTER
         return packed_data
+
+class SerialDongle(object):
+    """ A SerialDongle to ZigBee simulator.
+        Receives and send commands through a serial port
+    """
+
+    def __init__(self, port):
+        self.protocol_parser = ProtocolParser(port)
+
+    def start(self):
+        pass
+
+
 
 
 if __name__ == "__main__":
